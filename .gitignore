@@ -3,6 +3,7 @@
 
 # Environment configuration (contains sensitive information)
 .env
+.github_token
 
 # Runtime data files
 data/세션_정보.txt
