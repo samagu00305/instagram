@@ -1,0 +1,18 @@
+# Editor settings
+.vscode/
+
+# Environment configuration (contains sensitive information)
+.env
+
+# Runtime data files
+data/세션_정보.txt
+data/댓글_카운트.txt
+data/일일_한도.txt
+data/수동참여링크.txt
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# AutoHotkey
+*.exe
