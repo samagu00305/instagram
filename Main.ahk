@@ -1240,11 +1240,39 @@ AskAIAndGetResponse_WRTN()
         isFormRequired := CheckManualParticipationKeywords(g_LastFilteredContent)
     }
 
-    ; 9-1. 제외 판단이 예이면 스킵
+    ; 9-1. 제외 판단이 예이면 관심 없음 처리 후 스킵
     if (isExcluded)
     {
-        Debug("제외 판단 - 스킵")
-        Send, ^w
+        Debug("제외 판단 - 관심 없음 처리 시작")
+        Send, ^w  ; AI 탭 닫기
+        RandomDelay(0.5)
+
+        ; 1. 인스타그램 팝업 메뉴 버튼 클릭
+        popupMenuResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 메뉴 버튼", 5, 1)
+        if (popupMenuResult)
+        {
+            Debug("인스타그램 팝업 메뉴 버튼 클릭 성공")
+            RandomDelay(2)
+
+            ; 2. 관심 없음 버튼 클릭
+            notInterestedResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 메뉴 관심 없음", 5, 1)
+            if (notInterestedResult)
+            {
+                Debug("관심 없음 클릭 성공")
+                RandomDelay(1)
+            }
+            else
+            {
+                Debug("관심 없음 버튼을 찾을 수 없음 - ESC로 닫기")
+                Send, {Escape}
+                RandomDelay(0.5)
+            }
+        }
+        else
+        {
+            Debug("팝업 메뉴 버튼을 찾을 수 없음 - 스킵")
+        }
+
         return -1
     }
 
