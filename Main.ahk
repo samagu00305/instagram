@@ -423,19 +423,9 @@ ButtonTest:
             GuiControl,, Progress, 팝업 닫기 버튼을 찾는 중... (재시도 %retryCount%회)
             Debug("재시도 " . retryCount . "회 - 스크롤 다운 방식")
 
-            ; 팝업 닫기 버튼 클릭
-            popupResult := CloseInstagramPopup()
-
-            if (popupResult)
-            {
-                GuiControl,, Progress, 팝업 닫기 성공! 2초 대기 중...
-                Debug("팝업 닫기 버튼 클릭 성공")
-            }
-            else
-            {
-                GuiControl,, Progress, 팝업 닫기 버튼을 찾을 수 없음 (계속 진행)
-                Debug("팝업 닫기 버튼을 찾을 수 없습니다 - 계속 진행")
-            }
+            ; ESC 키로 팝업 닫기
+            CloseInstagramPopup()
+            GuiControl,, Progress, 팝업 닫기 완료!
 
             ; 랜덤 딜레이 (기준: 2초)
             RandomDelay(2)
@@ -542,17 +532,10 @@ ButtonTest:
 
                         ; 팝업 닫기만 수행 (랜덤 대기 후)
                         RandomDelay(3)
-                        GuiControl,, Progress, 팝업 닫기 버튼 클릭 중...
-                        closePopupResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 닫기 버튼", 5, 1)
-
-                        if (!closePopupResult)
-                        {
-                            Debug("팝업 닫기 버튼을 찾을 수 없습니다 - 계속 진행")
-                        }
-                        else
-                        {
-                            Debug("팝업 닫기 버튼 클릭 성공")
-                        }
+                        GuiControl,, Progress, ESC 키로 팝업 닫기 중...
+                        Debug("ESC 키로 팝업 닫기")
+                        Send, {Escape}
+                        Sleep, 500
 
                         ; 대기 후 다음 게시물로 이동
                         RandomDelay(3)
@@ -580,17 +563,10 @@ ButtonTest:
 
                     ; 1. 팝업 닫기 (랜덤 대기 후)
                     RandomDelay(3)
-                    GuiControl,, Progress, 팝업 닫기 버튼 클릭 중...
-                    closePopupResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 닫기 버튼", 5, 1)
-
-                    if (!closePopupResult)
-                    {
-                        Debug("팝업 닫기 버튼을 찾을 수 없습니다 - 계속 진행")
-                    }
-                    else
-                    {
-                        Debug("팝업 닫기 버튼 클릭 성공")
-                    }
+                    GuiControl,, Progress, ESC 키로 팝업 닫기 중...
+                    Debug("ESC 키로 팝업 닫기")
+                    Send, {Escape}
+                    Sleep, 500
 
                     ; 2. 메뉴 버튼 클릭 (랜덤 대기 후)
                     RandomDelay(2)
@@ -902,17 +878,13 @@ FindAndClickHomeImage()
     return result
 }
 
-; 인스타그램 팝업 닫기 버튼 클릭
+; 인스타그램 팝업 닫기 (ESC 키)
 CloseInstagramPopup()
 {
-    imagePath := "인스타그램 팝업 닫기 버튼"
-
-    Debug("인스타그램 팝업 닫기 버튼 검색 시작: " . imagePath)
-
-    ; 최대 5번, 1초 간격으로 이미지를 찾아서 중앙 클릭 시도
-    result := ClickAtCenterWhileFoundImage(imagePath, 5, 1)
-
-    return result
+    Debug("ESC 키로 팝업 닫기")
+    Send, {Escape}
+    Sleep, 500
+    return true
 }
 
 ; 댓글 버튼 이미지 찾아서 클릭
