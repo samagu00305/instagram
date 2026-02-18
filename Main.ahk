@@ -173,6 +173,9 @@ ButtonTest:
         isRunning := true
         retryCount := 0
 
+        ; 크롬 창 선택 대기 (10초 카운트다운)
+        SleepWithCountdown(10, "크롬 창을 선택해주세요")
+
         ; 새 세션 시작
         SaveSessionStartTime()
 
@@ -387,31 +390,14 @@ ButtonTest:
 
         if (cycle == 0)
         {
-            ; 1회차, 8회차, 15회차...: 인스타그램 버튼 클릭 방식
-            GuiControl,, Progress, 홈 화면 이미지를 찾는 중... (재시도 %retryCount%회)
-            Debug("재시도 " . retryCount . "회 - 인스타그램 버튼 방식")
+            ; 1회차, 8회차, 15회차...: 인스타그램 홈 URL 이동 방식
+            GuiControl,, Progress, 인스타그램 홈으로 이동 중... (재시도 %retryCount%회)
+            Debug("재시도 " . retryCount . "회 - 인스타그램 홈 URL 이동 방식")
 
-            ; 홈 화면 이미지 찾아서 클릭
-            result := FindAndClickHomeImage()
+            ; 인스타그램 홈으로 이동
+            FindAndClickHomeImage()
 
-            if (!result)
-            {
-                GuiControl,, Progress, 홈 화면 이미지를 찾을 수 없습니다.
-                GuiControl,, Status, 실패
-                Debug("홈 화면 이미지를 찾을 수 없습니다")
-                MsgBox, 인스타그램 버튼 이미지를 찾을 수 없습니다.`n`nImage 폴더에 인스타그램 버튼 이미지를 추가해주세요.`n이미지 파일명: 인스타그램 버튼.png
-
-                ; 텔레그램 알림
-                TelegramSend("🚫 작업 중지됨" . "`n" . "인스타그램 버튼 이미지를 찾을 수 없습니다." . "`n" . "Image 폴더에 '인스타그램 버튼.png' 파일을 추가해주세요.")
-
-                isRunning := false
-                SleepTime(2)
-                GuiControl,, Status, 대기 중...
-                GuiControl,, Progress, 진행 상태 표시
-                return
-            }
-
-            GuiControl,, Progress, 홈 화면 이미지 클릭 성공! 랜덤 대기 중...
+            GuiControl,, Progress, 인스타그램 홈 이동 완료! 랜덤 대기 중...
             Debug("홈 화면 이미지 클릭 성공")
 
             ; 랜덤 딜레이 (기준: 5초)
@@ -488,7 +474,33 @@ ButtonTest:
                 if (!CheckEventKeywords(g_LastFilteredContent))
                 {
                     retryDelay := g_RetryDelaySeconds()
-                    Debug("이벤트 판단 키워드 없음 - 이벤트 아님, 게시물 스킵")
+                    Debug("이벤트 판단 키워드 없음 - 이벤트 아님, 관심 없음 처리 후 스킵")
+                    GuiControl,, Progress, 이벤트 아님 - 관심 없음 처리 중...
+
+                    ; 관심 없음 처리
+                    popupMenuResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 메뉴 버튼", 5, 1)
+                    if (popupMenuResult)
+                    {
+                        Debug("인스타그램 팝업 메뉴 버튼 클릭 성공")
+                        RandomDelay(2)
+                        notInterestedResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 메뉴 관심 없음", 5, 1)
+                        if (notInterestedResult)
+                        {
+                            Debug("관심 없음 클릭 성공")
+                            RandomDelay(1)
+                        }
+                        else
+                        {
+                            Debug("관심 없음 버튼을 찾을 수 없음 - ESC로 닫기")
+                            Send, {Escape}
+                            RandomDelay(0.5)
+                        }
+                    }
+                    else
+                    {
+                        Debug("팝업 메뉴 버튼을 찾을 수 없음 - 스킵")
+                    }
+
                     SleepWithCountdown(retryDelay, "이벤트 키워드 없음")
                     GoTo, RetryPoint
                 }
@@ -499,7 +511,33 @@ ButtonTest:
                 if (CheckBlacklist(g_LastFilteredContent))
                 {
                     retryDelay := g_RetryDelaySeconds()
-                    Debug("제외 키워드 발견 - 게시물 스킵")
+                    Debug("제외 키워드 발견 - 관심 없음 처리 후 스킵")
+                    GuiControl,, Progress, 제외 키워드 발견 - 관심 없음 처리 중...
+
+                    ; 관심 없음 처리
+                    popupMenuResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 메뉴 버튼", 5, 1)
+                    if (popupMenuResult)
+                    {
+                        Debug("인스타그램 팝업 메뉴 버튼 클릭 성공")
+                        RandomDelay(2)
+                        notInterestedResult := ClickAtCenterWhileFoundImage("인스타그램 팝업 메뉴 관심 없음", 5, 1)
+                        if (notInterestedResult)
+                        {
+                            Debug("관심 없음 클릭 성공")
+                            RandomDelay(1)
+                        }
+                        else
+                        {
+                            Debug("관심 없음 버튼을 찾을 수 없음 - ESC로 닫기")
+                            Send, {Escape}
+                            RandomDelay(0.5)
+                        }
+                    }
+                    else
+                    {
+                        Debug("팝업 메뉴 버튼을 찾을 수 없음 - 스킵")
+                    }
+
                     SleepWithCountdown(retryDelay, "제외 키워드 발견")
                     GoTo, RetryPoint
                 }
@@ -866,16 +904,15 @@ return
 ; 홈 화면 이미지 찾아서 클릭
 FindAndClickHomeImage()
 {
-    ; Image 폴더에 있는 인스타그램 버튼.png 이미지를 찾아서 클릭
-    ; 이미지 경로: Image\인스타그램 버튼.png
-    imagePath := "인스타그램 버튼"
+    ; URL 직접 이동으로 인스타그램 홈으로 이동
+    Debug("인스타그램 홈 URL 직접 이동")
+    Send, ^l
+    Sleep, 500
+    Send, https://www.instagram.com/
+    Send, {Enter}
+    Sleep, 2000
 
-    Debug("홈 화면 이미지 검색 시작: " . imagePath)
-
-    ; 최대 5번, 1초 간격으로 이미지를 찾아서 중앙 클릭 시도
-    result := ClickAtCenterWhileFoundImage(imagePath, 5, 1)
-
-    return result
+    return true
 }
 
 ; 인스타그램 팝업 닫기 (ESC 키)
@@ -981,44 +1018,27 @@ CopyAndFilterAfterMeta()
     ; 클립보드 초기화
     Clipboard := ""
 
-    ; 1. "인스타그램 팝업 닫기 버튼" 이미지 찾기
-    imagePath := A_ScriptDir . "\Image\인스타그램 팝업 닫기 버튼.png"
-    ImageSearch, foundX, foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, *50 %imagePath%
+    ; 고정 좌표로 드래그 선택 (시작: 좌측 Y=250, 끝: 화면 우측 하단)
+    startX := 10
+    startY := 250
+    endX := A_ScreenWidth
+    endY := A_ScreenHeight
 
-    if (ErrorLevel)
-    {
-        Debug("팝업 닫기 버튼을 찾을 수 없어 기존 방식 사용")
-        ; 기존 방식으로 폴백
-        Send, ^a
-        RandomDelay(0.5)
-        Send, ^c
-        RandomDelay(0.5)
-    }
-    else
-    {
-        ; 2. 화면 왼쪽(10), 닫기 버튼 Y좌표 + 50 위치에서 드래그 시작
-        startX := 10
-        startY := foundY + 50
-        endX := foundX
-        endY := A_ScreenHeight
+    Debug("드래그 선택: (" . startX . ", " . startY . ") → (" . endX . ", " . endY . ")")
 
-        Debug("드래그 선택: (" . startX . ", " . startY . ") → (" . endX . ", " . endY . ")")
+    MouseMove, %startX%, %startY%
+    RandomDelay(0.3)
+    Click, down
+    RandomDelay(0.2)
+    MouseMove, %endX%, %endY%
+    RandomDelay(0.2)
+    Click, up
+    RandomDelay(0.3)
 
-        ; 3. 마우스 드래그로 선택
-        MouseMove, %startX%, %startY%
-        RandomDelay(0.3)
-        Click, down
-        RandomDelay(0.2)
-        MouseMove, %endX%, %endY%
-        RandomDelay(0.2)
-        Click, up
-        RandomDelay(0.3)
-
-        ; 4. Ctrl+C로 복사
-        Send, ^c
-        Debug("복사 (Ctrl+C)")
-        RandomDelay(0.5)
-    }
+    ; Ctrl+C로 복사
+    Send, ^c
+    Debug("복사 (Ctrl+C)")
+    RandomDelay(0.5)
 
     ; 클립보드 내용 확인
     ClipWait, 2
