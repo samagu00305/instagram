@@ -284,9 +284,15 @@ GetActivityProbabilityByHour(hour)
         if (hour >= 12 && hour < napStart)
             return 70
 
-        ; 낮잠시작~낮잠끝 - 낮잠 시간 (0% - 비활성)
+        ; 낮잠시작~낮잠끝 - 낮잠 시간 (체크박스 ON이면 0%, OFF면 70%)
+        global g_AfternoonNapEnabled
         if (hour >= napStart && hour < napEnd)
-            return 0
+        {
+            if (g_AfternoonNapEnabled)
+                return 0
+            else
+                return 70
+        }
 
         ; 낮잠끝~18:00 - 오후 (70%)
         if (hour >= napEnd && hour < 18)
@@ -325,9 +331,15 @@ GetActivityProbabilityByHour(hour)
     if (hour >= 12 && hour < afternoonStart)
         return 70
 
-    ; 오후업무시작~오후업무끝 - 오후 업무 (0% - 비활성)
+    ; 오후업무시작~오후업무끝 - 오후 수면 (체크박스 ON이면 0%, OFF면 70%)
+    global g_AfternoonNapEnabled
     if (hour >= afternoonStart && hour < afternoonEnd)
-        return 0
+    {
+        if (g_AfternoonNapEnabled)
+            return 0
+        else
+            return 70
+    }
 
     ; 오후업무끝~21:00 - 퇴근 후, 활발 (80%)
     if (hour >= afternoonEnd && hour < 21)

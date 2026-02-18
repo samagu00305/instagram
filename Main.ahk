@@ -20,6 +20,7 @@ Gui, Add, Button, x120 y140 w90 h30 gButtonStop, 작업 중지
 Gui, Add, Text, x120 y175 w90 h20 Center, (진행 중단)
 Gui, Add, Button, x120 y210 w90 h30 gButtonTestComment, 댓글 테스트
 Gui, Add, Text, x120 y245 w90 h20 Center, (조건무시 댓글)
+Gui, Add, CheckBox, x220 y210 w180 h30 vAfternoonNapEnabled Checked, 오후 수면시간 사용
 
 ; 워밍업이 활성화되어 있을 때만 워밍업 버튼 표시
 if (g_WarmupEnabled())
@@ -39,6 +40,8 @@ else
 global g_SkipSleepTimeCheck := false
 ; 전역 변수 - 테스트 모드 플래그 (모든 조건 검사 통과)
 global g_TestMode := false
+; 전역 변수 - 오후 수면시간 사용 여부
+global g_AfternoonNapEnabled := true
 
 ; 자동 워밍업 체크
 CheckAutoWarmup()
@@ -112,9 +115,13 @@ return
 ; 일반 시작 버튼 (수면 시간 체크 활성화)
 ButtonTestNormal:
     {
+        ; 체크박스 상태 읽기
+        Gui, Submit, NoHide
+        g_AfternoonNapEnabled := AfternoonNapEnabled
+
         ; 수면 시간 체크 플래그 초기화
         g_SkipSleepTimeCheck := false
-        Debug("일반 시작 - 수면 시간 체크 활성화")
+        Debug("일반 시작 - 수면 시간 체크 활성화, 오후 수면시간: " . (g_AfternoonNapEnabled ? "ON" : "OFF"))
 
         ; 일반 시작 버튼과 동일한 로직 실행
         Gosub, ButtonTest
@@ -767,9 +774,13 @@ return
 ; 테스트 시작 버튼 (수면 시간 무시)
 ButtonTestNoSleep:
     {
+        ; 체크박스 상태 읽기
+        Gui, Submit, NoHide
+        g_AfternoonNapEnabled := AfternoonNapEnabled
+
         ; 수면 시간 체크 건너뛰기 플래그 설정
         g_SkipSleepTimeCheck := true
-        Debug("테스트 시작 - 수면 시간 체크 건너뜀")
+        Debug("테스트 시작 - 수면 시간 체크 건너뜀, 오후 수면시간: " . (g_AfternoonNapEnabled ? "ON" : "OFF"))
 
         ; 일반 시작 버튼과 동일한 로직 실행
         Gosub, ButtonTest
