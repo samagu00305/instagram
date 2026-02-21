@@ -906,9 +906,11 @@ FindAndClickHomeImage()
 {
     ; URL 직접 이동으로 인스타그램 홈으로 이동
     Debug("인스타그램 홈 URL 직접 이동")
+    Clipboard := "https://www.instagram.com/"
     Send, ^l
     Sleep, 500
-    Send, https://www.instagram.com/
+    Send, ^a
+    Send, ^v
     Send, {Enter}
     Sleep, 2000
 
@@ -1065,8 +1067,8 @@ CopyAndFilterAfterMeta()
     afterPos := foundPos + StrLen(searchText)
     filteredText := SubStr(copiedText, afterPos)
 
-    ; 전역 변수에 저장 (수동 참여 키워드 체크용)
-    g_LastFilteredContent := filteredText
+    ; 전역 변수에 저장 - 키워드 체크는 전체 텍스트로 (캡션 포함)
+    g_LastFilteredContent := copiedText
 
     ; 파일에서 프롬프트 읽기
     additionalText := LoadPromptFromFile("data\AI게시글판단_프롬프트.txt")
