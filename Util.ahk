@@ -156,7 +156,7 @@ FindImage_Byref(imageName, Byref errLevel, Byref foundX, Byref foundY, searchSta
         searchEnd_y := A_ScreenHeight
     }
 
-    ImageSearch, FoundX, FoundY, searchStart_x, searchStart_y, searchEnd_x, searchEnd_y, *Trans091A36 *40 %A_ScriptDir%\Image\%imageName%.png
+    ImageSearch, FoundX, FoundY, searchStart_x, searchStart_y, searchEnd_x, searchEnd_y, *Trans091A36 *60 %A_ScriptDir%\Image\%imageName%.png
 
     Debug(imageName . " - ErrorLevel:" . ErrorLevel . " FoundX:" . FoundX . " FoundY:" . FoundY)
     errLevel := ErrorLevel
@@ -245,7 +245,7 @@ MoveAtWhileFoundImage(imageName, addX := 0, addY := 0, findMaxCount := 10, delay
 IsImageExist(imageName, searchStart_x := 0, searchStart_y := 0)
 {
     CoordMode, Pixel, Screen
-    ImageSearch, FoundX, FoundY, searchStart_x, searchStart_y, A_ScreenWidth, A_ScreenHeight, *Trans091A36 *40 %A_ScriptDir%\Image\%imageName%.png
+    ImageSearch, FoundX, FoundY, searchStart_x, searchStart_y, A_ScreenWidth, A_ScreenHeight, *Trans091A36 *60 %A_ScriptDir%\Image\%imageName%.png
     return (ErrorLevel = g_ErrorType_Success() && FoundX != "" && FoundY != "")
 }
 
